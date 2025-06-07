@@ -11,17 +11,6 @@ const client = new Client({
     ]
 });
 
-// Charger les variables d'environnement
-require('dotenv').config();
-
-const { Client, GatewayIntentBits, SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
-
-// Vérifier que le token existe
-if (!process.env.DISCORD_TOKEN) {
-    console.error('❌ DISCORD_TOKEN non trouvé dans les variables d\'environnement !');
-    process.exit(1);
-}
-
 // Gestion des erreurs pour éviter les crashes
 process.on('unhandledRejection', (error) => {
     console.error('❌ Erreur non gérée (Promise):', error);
