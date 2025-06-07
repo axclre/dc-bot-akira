@@ -482,4 +482,4 @@ client.on('messageCreate', async (message) => {
 client.on('error', console.error);
 
 // Remplacez par votre token
-client.login(process.env.MTM4MTAxMjQ0NzA2NjA2NzA1NA.G_qZ_N.cNuP8J9ucfAWIGg9o4d_V6UgIYoFqkOr9DLfdU);
+client.login(process.env.DISCORD_TOKEN);
