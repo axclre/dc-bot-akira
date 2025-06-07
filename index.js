@@ -11,6 +11,8 @@ const client = new Client({
     ]
 });
 
+console.log("Token détecté par Render :", process.env.TOKEN);
+
 // Garder le service éveillé (optionnel)
 const http = require('http');
 const server = http.createServer((req, res) => {
