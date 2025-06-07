@@ -11,6 +11,18 @@ const client = new Client({
     ]
 });
 
+// Garder le service éveillé (optionnel)
+const http = require('http');
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot Discord actif !');
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🌐 Serveur web actif sur le port ${PORT}`);
+});
+
 // Gestion des erreurs pour éviter les crashes
 process.on('unhandledRejection', (error) => {
     console.error('❌ Erreur non gérée (Promise):', error);
