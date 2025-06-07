@@ -1,0 +1,17 @@
+# Dépendances
+node_modules/
+
+# Fichiers de configuration locale
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
