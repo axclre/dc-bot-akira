@@ -4,6 +4,7 @@ node_modules/
 # Fichiers de configuration locale
 .env
 .env.local
+.env.production
 
 # Logs
 *.log
