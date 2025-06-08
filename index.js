@@ -1,5 +1,70 @@
 const { Client, GatewayIntentBits, SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 
+// ✅ FONCTION ROBUSTE POUR RÉCUPÉRER LE TOKEN DISCORD
+function getDiscordToken() {
+    console.log('🔍 Récupération du token Discord...');
+    
+    // 1. Essayer le token encodé en Base64 (méthode recommandée pour Render)
+    if (process.env.DISCORD_TOKEN_ENCODED) {
+        try {
+            const decodedToken = Buffer.from(process.env.DISCORD_TOKEN_ENCODED, 'base64').toString('utf-8');
+            console.log('✅ Token décodé depuis Base64');
+            return decodedToken;
+        } catch (error) {
+            console.error('❌ Erreur décodage Base64:', error.message);
+        }
+    }
+    
+    // 2. Essayer le token direct
+    if (process.env.DISCORD_TOKEN) {
+        console.log('✅ Token trouvé directement');
+        return process.env.DISCORD_TOKEN;
+    }
+    
+    // 3. Essayer TOKEN (votre variable actuelle)
+    if (process.env.TOKEN) {
+        let token = process.env.TOKEN;
+        
+        // Si Render a parsé le token comme un objet à cause des points
+        if (typeof token === 'object' && token !== null) {
+            console.log('⚠️ Token parsé comme objet, reconstruction...');
+            console.log('Structure détectée:', Object.keys(token));
+            
+            // Reconstruire le token depuis l'objet
+            const tokenParts = [];
+            const keys = Object.keys(token).sort();
+            
+            for (const key of keys) {
+                if (token[key]) {
+                    tokenParts.push(token[key]);
+                }
+            }
+            
+            if (tokenParts.length > 0) {
+                const reconstructedToken = tokenParts.join('.');
+                console.log('✅ Token reconstruit depuis l\'objet');
+                return reconstructedToken;
+            }
+        } else if (typeof token === 'string') {
+            console.log('✅ Token trouvé comme chaîne');
+            return token;
+        }
+    }
+    
+    // 4. Debug : afficher toutes les variables qui contiennent "TOKEN" ou "DISCORD"
+    console.log('🔍 Variables d\'environnement disponibles:');
+    const relevantVars = Object.keys(process.env).filter(key => 
+        key.includes('TOKEN') || key.includes('DISCORD')
+    );
+    
+    for (const varName of relevantVars) {
+        const value = process.env[varName];
+        console.log(`  ${varName}: ${typeof value} (${typeof value === 'string' ? value.substring(0, 10) + '...' : 'objet'})`);
+    }
+    
+    throw new Error('❌ Aucun token Discord valide trouvé dans les variables d\'environnement');
+}
+
 // Configuration du bot
 const client = new Client({
     intents: [
@@ -11,7 +76,21 @@ const client = new Client({
     ]
 });
 
-console.log("Token détecté par Render :", process.env.TOKEN);
+// Récupération sécurisée du token
+let discordToken;
+try {
+    discordToken = getDiscordToken();
+    console.log('✅ Token Discord récupéré avec succès');
+} catch (error) {
+    console.error(error.message);
+    console.log('📝 Instructions pour configurer le token sur Render:');
+    console.log('   1. Méthode recommandée - Encodage Base64:');
+    console.log('      - Encodez votre token: echo "VOTRE_TOKEN_COMPLET" | base64');
+    console.log('      - Ajoutez la variable: DISCORD_TOKEN_ENCODED=TOKEN_ENCODÉ');
+    console.log('   2. Alternative - Token direct avec guillemets:');
+    console.log('      - Ajoutez la variable: DISCORD_TOKEN="VOTRE_TOKEN_COMPLET"');
+    process.exit(1);
+}
 
 // Garder le service éveillé (optionnel)
 const http = require('http');
@@ -483,5 +562,13 @@ client.on('messageCreate', async (message) => {
 // Gestion des erreurs
 client.on('error', console.error);
 
-// Remplacez par votre token
-client.login(process.env.TOKEN);
+// ✅ CONNEXION SÉCURISÉE AVEC LE TOKEN RÉCUPÉRÉ
+client.login(discordToken)
+    .then(() => {
+        console.log('🎉 Connexion Discord réussie !');
+    })
+    .catch(error => {
+        console.error('❌ Erreur de connexion Discord:', error.message);
+        console.log('💡 Vérifiez que votre token est correct et que le bot a les permissions nécessaires.');
+        process.exit(1);
+    });
