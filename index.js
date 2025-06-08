@@ -92,12 +92,19 @@ try {
     process.exit(1);
 }
 
-// Garder le service éveillé (optionnel)
-const http = require('http');
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot Discord actif !');
+const express = require('express');
+const app = express();
+
+app.get('/ping', (req, res) => {
+  res.send('Pong!');
 });
+
+app.listen(process.env.PORT || 3000);
+
+setInterval(() => {
+  const url = `https://dc-bot-akira.onrender.com/ping`;
+  fetch(url).catch(console.error);
+}, 6 * 60 * 1000); // Ping evr 6 mins
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
