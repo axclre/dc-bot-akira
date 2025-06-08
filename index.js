@@ -107,7 +107,7 @@ setInterval(() => {
 }, 6 * 60 * 1000); // Ping evr 6 mins
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`🌐 Serveur web actif sur le port ${PORT}`);
 });
 
